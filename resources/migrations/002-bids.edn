@@ -1,0 +1,2 @@
+{:up ["CREATE TABLE bids (id serial primary key, bidder varchar(2000) not null, amount bigint not null, at timestamp not null, auctionId bigint not null, CONSTRAINT fk_bid_auction FOREIGN KEY(auctionId) REFERENCES auctions(id));"]
+ :down ["DROP TABLE bids"]}
