@@ -13,22 +13,37 @@
 (defn as-auction [row]
   (dissoc (rename-keys row {:position :order, :startsat :startsAt, :endsat :expiry}) :timeframe :minraise :reserveprice))
 
+(defn as-bid [row]
+  (dissoc (rename-keys row {:position :order}) :at :id :auctionid))
+
+
+(defn- map-auction-with-bids [bids-for-auction]
+  (fn [{:keys [id] :as auction}] (merge auction {:bids (map as-bid (bids-for-auction id))})))
+
 (defn create-auctions [db auction]
   (as-auction (sql/insert! db :auctions (as-row auction))))
 
+(defn- get-auctions-sql [db auction-sql-params bids-sql-params]
+  (let [auctions (jdbc/execute! db auction-sql-params)
+        bids (jdbc/execute! db bids-sql-params)
+        mapped-auctions (map as-auction auctions)
+        grouped-bids (group-by :auctionid bids)
+        bids-for-auction (fn [id] (get grouped-bids id []))]
+    (map (map-auction-with-bids bids-for-auction) mapped-auctions)))
+
 (defn get-auction [db id]
-  (as-auction (sql/get-by-id db :auctions id)))
+  (let [auctions (get-auctions-sql db ["SELECT * FROM auctions WHERE id = ?" id] [ "SELECT * FROM bids WHERE auctionId = ?" id])]
+    (first auctions)))
 
 (defn update-auction [db body id]
   (sql/update! db :auctions (as-row body) {:id id})
   (get-auction db id))
 
-(defn delete-auctions [db id]
-  (sql/delete! db :auctions {:id id}))
+(defn add-bid [db body id]
+  (sql/insert! db :bids (merge (as-row body) {:auctionId id}))
+  (get-auction db id))
 
-(defn get-all-auctions [db] 
-  (let [auctions (jdbc/execute! db ["SELECT * FROM auctions;"])]
-   (map as-auction auctions)))
 
-(defn delete-all-auctions [db]
-  (sql/delete! db :auctions [true]))
+(defn get-all-auctions [db]
+  (get-auctions-sql db ["SELECT * FROM auctions"] ["SELECT * FROM bids"]))
+

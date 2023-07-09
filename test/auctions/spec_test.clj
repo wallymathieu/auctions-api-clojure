@@ -11,7 +11,7 @@
                      :auctions/user valid-user
                      :auctions/currency-code "SEK"}
       invalid-auction {}
-      invalid-auction2 (conj valid-auction {:auctions/user invalid-user})
+      invalid-auction2 (merge valid-auction {:auctions/user invalid-user})
       ]
 
   (deftest schema-spec

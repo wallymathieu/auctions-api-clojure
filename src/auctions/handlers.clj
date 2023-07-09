@@ -34,19 +34,24 @@
 (defn create-auction [db {:keys [body-params] :as request}]
   (if-authorized request
                  (fn [user]
-                   (let [auction-with-user (conj body-params {:seller (get user "sub")})]
+                   (let [auction-with-user (merge body-params {:seller (get user "sub")})]
                      (-> (store/create-auctions db auction-with-user)
                          (append-auction-url request)
                          rr/response)))))
 
-(defn delete-all-auctions [db request]
-  (if-authorized request
-                 (fn [_]
-                   (store/delete-all-auctions db)
-                   (rr/status 204))))
 
 (defn retrieve-auction [db {:keys [parameters] :as request}]
   (let [id (-> parameters :path :id)]
     (-> (store/get-auction db id)
         (append-auction-url request)
         rr/response)))
+
+(defn add-bid-to-auction [db {:keys [parameters, body-params] :as request}]
+  (if-authorized request
+               (fn [user]
+                 (let [id (-> parameters :path :id)
+                       bid-with-user (merge body-params {:bidder (get user "sub") :at (java.time.LocalDateTime/now)})]
+                   (-> (store/add-bid db bid-with-user id)
+                       (append-auction-url request)
+                       rr/response)))))
+
