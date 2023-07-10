@@ -1,4 +1,4 @@
-(ns auctions.api-singel-auction-with-bid-test
+(ns auctions.api-single-auction-with-bid-test
   (:require [auctions.api-helpers :refer [request]]
             [auctions.migration :refer [migrate]]
             [auctions.samples :refer [buyer sample-auction seller]]
