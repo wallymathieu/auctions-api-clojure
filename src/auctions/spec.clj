@@ -68,7 +68,10 @@ type Auction =
 (s/def :auctions/at date-type)
 (s/def :auctions/amount int?)
 (s/def :auctions/user :auctions/user-type)
-(s/def :auctions/auction (s/keys :req [:auctions/title :auctions/starts-at :auctions/expiry :auctions/user :auctions/currency-code]
+(s/def :auctions/auction (s/keys 
+                            :req-un [:auctions/title :auctions/starts-at :auctions/expiry :auctions/user :auctions/currency-code]
                             :opt [:auctions/id]))
-(s/def :auctions/bid (s/keys :req [:auctions/id :auctions/title :auctions/at :auctions/amount :auctions/user]
-                                 :opt []))
+; if we want to use 'id' for auctions and for bids we need two separate keys, i.e. :auctions/id , :bids/id
+(s/def :auctions/bid (s/keys 
+                            :req-un [:auctions/amount :auctions/user]
+                            :opt []))
