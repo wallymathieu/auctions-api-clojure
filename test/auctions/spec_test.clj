@@ -15,8 +15,11 @@
       ]
 
   (deftest schema-spec
-    ;(testing "a valid email."
-    ;  (is (= true (s/valid? :acct/email valid-email))))
+    (testing "invalid user"
+      (is (= false (s/valid? :auctions/user invalid-user))))
+    (testing "valid user"
+      (is (= true (s/valid? :auctions/user valid-user))))
+    
     (testing "invalid auction"
       (is (= false (s/valid? :auctions/auction invalid-auction)))
       (is (= false (s/valid? :auctions/auction invalid-auction2))))

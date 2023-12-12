@@ -10,7 +10,7 @@
   ;         |DKK=208
   )
 (s/def :auctions/currency-code string?)
-(def user-regex #"(?<type>\w*)\|(?<id>[^|]*)(\|(?<name>.*))?")
+(def user-regex #"\w*\|[^|]*\|.*?")
 (s/def :auctions/user-type (s/and string? #(re-matches user-regex %)))
 
 (comment
@@ -23,7 +23,7 @@
     ;  | type', _, _ -> None
     ;else None
   )
-(def amount-regex #"(?<currency>[A-Z]+)(?<value>[0-9]+)")
+(def amount-regex #"[A-Z]+[0-9]+")
 (s/def :auctions/amount-type (s/and string? #(re-matches amount-regex %)))
 
 (comment "
@@ -68,10 +68,14 @@ type Auction =
 (s/def :auctions/at date-type)
 (s/def :auctions/amount int?)
 (s/def :auctions/user :auctions/user-type)
-(s/def :auctions/auction (s/keys 
-                            :req-un [:auctions/title :auctions/starts-at :auctions/expiry :auctions/user :auctions/currency-code]
+(s/def :auctions/auction (s/keys
+                            :req [:auctions/title
+                                     :auctions/starts-at 
+                                     :auctions/expiry 
+                                     :auctions/user 
+                                     :auctions/currency-code]
                             :opt [:auctions/id]))
 ; if we want to use 'id' for auctions and for bids we need two separate keys, i.e. :auctions/id , :bids/id
 (s/def :auctions/bid (s/keys 
-                            :req-un [:auctions/amount :auctions/user]
+                            :req [:auctions/amount :auctions/user]
                             :opt []))
