@@ -23,6 +23,6 @@ jobs:
       with:
         cli: 'latest'
     - name: Install dependencies
-      run: clj -X:deps prep
+      run: clojure -X:deps prep
     - name: Run tests
-      run: clj -X:test
+      run: clojure -X:test
