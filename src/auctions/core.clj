@@ -4,7 +4,7 @@
             [auctions.store :as store :refer [db-from-ds jdbc-database-url]]
             [muuntaja.core :as m]
             [next.jdbc :as jdbc]
-            [reitit.coercion.schema :as rcs] ; should be malli
+            [reitit.coercion.malli :as rcs]
             [reitit.ring :as ring]
             [reitit.ring.coercion :as rrc]
             [reitit.ring.middleware.muuntaja :as rrmm]
