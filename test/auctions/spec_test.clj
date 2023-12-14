@@ -1,26 +1,26 @@
 (ns auctions.spec-test
   (:require [auctions.spec :refer :all]
-            [clojure.spec.alpha :as s]
-            [clojure.test :refer :all]))
-(let [invalid-user "test"
-      valid-user "BuyerOrSeller|1|test@test.se"
-      valid-auction {
-                     :auctions/title "auction"
-                     :auctions/starts-at (java.time.LocalDateTime/parse "2023-03-15T11:50:55")
-                     :auctions/expiry (java.time.LocalDateTime/parse "2023-03-16T11:50:55")
-                     :auctions/user valid-user
-                     :auctions/currency-code "SEK"}
-      invalid-auction {}
-      invalid-auction2 (merge valid-auction {:auctions/user invalid-user})
-      ]
+            [clojure.test :refer :all]
+            [malli.core :as m]))
+
+(let [valid-user "BuyerOrSeller|1|test@test.se"
+      invalid-user "test"
+      valid-auction {:title "auction"
+                     :startsAt "2023-03-15T11:50:55"
+                     :expiry "2023-03-16T11:50:55"
+                     :user valid-user
+                     :currencyCode "SEK"}
+      invalid-auction2 (merge valid-auction {:user invalid-user})
+      invalid-auction {}]
 
   (deftest schema-spec
-    ;(testing "a valid email."
-    ;  (is (= true (s/valid? :acct/email valid-email))))
+    (testing "invalid user"
+      (is (= false (m/validate user-schema invalid-user))))
+    (testing "valid user"
+      (is (= true (m/validate user-schema valid-user))))
+
     (testing "invalid auction"
-      (is (= false (s/valid? :auctions/auction invalid-auction)))
-      (is (= false (s/valid? :auctions/auction invalid-auction2))))
+      (is (= false (m/validate auction-schema invalid-auction)))
+      (is (= false (m/validate auction-schema invalid-auction2))))
     (testing "a valid auction"
-      (is (= true (s/valid? :auctions/auction valid-auction)))
-      (is (= valid-auction (s/conform :auctions/auction valid-auction)))
-      )))
+      (is (= true (m/validate auction-schema valid-auction))))))
