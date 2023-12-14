@@ -1,5 +1,5 @@
 (ns auctions.spec
-  (:require [clojure.spec.alpha :as s]))
+  (:require [malli.core :as m]))
 (comment 
   ;type CurrencyCode =
   ;         /// virtual auction currency
@@ -9,8 +9,10 @@
   ;         /// Danish 'Krone'
   ;         |DKK=208
   )
-(s/def :auctions/currency-code string?)
 (def user-regex #"\w*\|[^|]*\|.*?")
+
+(def currency-code string?)
+
 (s/def :auctions/user-type (s/and string? #(re-matches user-regex %)))
 
 (comment

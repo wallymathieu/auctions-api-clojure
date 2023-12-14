@@ -2,16 +2,24 @@
   (:require [auctions.spec :refer :all]
             [clojure.spec.alpha :as s]
             [clojure.test :refer :all]))
+(def valid-user "BuyerOrSeller|1|test@test.se")
+(def valid-auction-1 {"title" "auction"
+                       "startsAt" (java.time.LocalDateTime/parse "2023-03-15T11:50:55")
+                       "expiry" (java.time.LocalDateTime/parse "2023-03-16T11:50:55")
+                       "user" valid-user
+                       "currencyCode" "SEK"})
+(comment 
+  [:map ["title" :string] ["startsAt" :some] ["expiry" :some] ["user" :string] ["currency-code" :string]]
+  )
 (let [invalid-user "test"
       valid-user "BuyerOrSeller|1|test@test.se"
-      valid-auction {
-                     :auctions/title "auction"
-                     :auctions/starts-at (java.time.LocalDateTime/parse "2023-03-15T11:50:55")
-                     :auctions/expiry (java.time.LocalDateTime/parse "2023-03-16T11:50:55")
-                     :auctions/user valid-user
-                     :auctions/currency-code "SEK"}
+      valid-auction {"title" "auction"
+                     "startsAt" (java.time.LocalDateTime/parse "2023-03-15T11:50:55")
+                     "expiry" (java.time.LocalDateTime/parse "2023-03-16T11:50:55")
+                     "user" valid-user
+                     "currencyCode" "SEK"}
       invalid-auction {}
-      invalid-auction2 (merge valid-auction {:auctions/user invalid-user})
+      invalid-auction2 (merge valid-auction {"user" invalid-user})
       ]
 
   (deftest schema-spec
