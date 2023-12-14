@@ -14,11 +14,16 @@
       invalid-auction {}]
 
   (deftest schema-spec
+    (testing "user schema is a schema"
+      (is (= true (m/schema? user-schema))))
+
     (testing "invalid user"
       (is (= false (m/validate user-schema invalid-user))))
     (testing "valid user"
       (is (= true (m/validate user-schema valid-user))))
 
+    (testing "auction schema is a schema"
+      (is (= true (m/schema? auction-schema))))
     (testing "invalid auction"
       (is (= false (m/validate auction-schema invalid-auction)))
       (is (= false (m/validate auction-schema invalid-auction2))))
