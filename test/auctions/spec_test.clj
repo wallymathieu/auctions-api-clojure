@@ -16,6 +16,8 @@
   (deftest schema-spec
     (testing "user schema is a schema"
       (is (= true (m/schema? user-schema))))
+    (testing "auction id schema is a schema"
+      (is (= true (m/schema? auction-id-schema))))
 
     (testing "invalid user"
       (is (= false (m/validate user-schema invalid-user))))

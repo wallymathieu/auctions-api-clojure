@@ -1,18 +1,19 @@
 (ns auctions.core
   (:require [auctions.handlers :as auction]
             [auctions.migration :refer [migrate]]
+            [auctions.spec :refer [auction-id-schema auction-schema]]
             [auctions.store :as store :refer [db-from-ds jdbc-database-url]]
             [muuntaja.core :as m]
-            [next.jdbc :as jdbc]
-            [reitit.coercion.malli :as rcs]
+            [next.jdbc :as jdbc] ;[reitit.coercion.schema :as rcs]
+            [reitit.coercion.malli :as rcm]
             [reitit.ring :as ring]
             [reitit.ring.coercion :as rrc]
             [reitit.ring.middleware.muuntaja :as rrmm]
             [reitit.swagger :as swagger]
             [reitit.swagger-ui :as swagger-ui]
             [ring.adapter.jetty :as jetty]
-            [ring.middleware.cors :refer [wrap-cors]]
-            [schema.core :as s]))
+            [ring.middleware.cors :refer [wrap-cors]] ;[schema.core :as s]
+))
 
 
 (defn app-routes [db]
@@ -29,17 +30,18 @@
      ["/auctions" {:get     {:summary "Retrieves the collection of Auction resources."
                              :handler (partial auction/list-all-auctions db)}
                    :post    {:summary "Creates a Auction resource."
+                             :body   auction-schema
                              :handler (partial auction/create-auction db)}
                    :options (fn [_] {:status 200})}]
-     ["/auctions/:id" {:parameters {:path {:id s/Int}}
+     ["/auctions/:id" {:parameters {:path {:id auction-id-schema}}
                        :get        {:summary "Retrieves a Auction resource."
-                                    ; :responses {200 {:body :auctions/auction}}
+                                    ; :responses {200 {:body auction-schema}}
                                     :handler (partial auction/retrieve-auction db)}}]
-     ["/auctions/:id/bids" {:parameters {:path {:id s/Int}}
+     ["/auctions/:id/bids" {:parameters {:path {:id auction-id-schema}}
                             :post        {:summary "Add bid to auction resource."
                                           :handler (partial auction/add-bid-to-auction db)}}]]
     {:data {:muuntaja   m/instance
-            :coercion   rcs/coercion
+            :coercion   rcm/coercion
             :middleware [rrmm/format-middleware
                          rrc/coerce-exceptions-middleware
                          rrc/coerce-response-middleware
