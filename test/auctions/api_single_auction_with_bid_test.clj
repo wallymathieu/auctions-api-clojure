@@ -27,6 +27,6 @@
                                 :in ["request" "body-params"],
                                 :humanized {:amount ["missing required key"]}}}
            (request db :post buyer (str "/auctions/" auction-id "/bids") {})))
-    ;(is (= {:status 404 :body nil}
-    ;       (request db :post buyer (str "/auctions/" 99 "/bids") {:amount 10})))
+    (is (= {:status 404 :body nil}
+           (request db :post buyer (str "/auctions/" 99 "/bids") {:amount 10})))
     ))
