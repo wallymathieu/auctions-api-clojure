@@ -1,5 +1,5 @@
 (ns auctions.spec-test
-  (:require [auctions.spec :refer [auction-id-schema auction-schema]]
+  (:require [auctions.spec :refer [AuctionId AuctionResult]]
             [clojure.test :refer [deftest is testing]]
             [malli.core :as m])
   ;(:import (java.time LocalDateTime ZonedDateTime))
@@ -24,17 +24,17 @@
 
   (deftest schema-spec
     (testing "auction id schema is a schema"
-      (is (true? (m/schema? auction-id-schema))))
+      (is (true? (m/schema? AuctionId))))
 
     (testing "auction schema is a schema"
-      (is (true? (m/schema? auction-schema))))
+      (is (true? (m/schema? AuctionResult))))
     (testing "invalid auction"
-      (is (false? (m/validate auction-schema invalid-auction)))
-      (is (false? (m/validate auction-schema invalid-auction-without-seller)))
+      (is (false? (m/validate AuctionResult invalid-auction)))
+      (is (false? (m/validate AuctionResult invalid-auction-without-seller)))
       ; (is (false? (m/validate auction-schema invalid-auction-with-wrong-time)))
-      (is (false? (m/validate auction-schema invalid-auction-without-currency))))
+      (is (false? (m/validate AuctionResult invalid-auction-without-currency))))
     (testing "a valid auction"
-      (is (true? (m/validate auction-schema valid-auction)))
+      (is (true? (m/validate AuctionResult valid-auction)))
       ; (is (true? (m/validate auction-schema valid-auction-with-local-time)))
       ; (is (true? (m/validate auction-schema valid-auction-with-zoned-time)))
-      (is (true? (m/validate auction-schema valid-auction-with-url-and-bids))))))
+      (is (true? (m/validate AuctionResult valid-auction-with-url-and-bids))))))

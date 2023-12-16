@@ -1,8 +1,8 @@
 (ns auctions.core
   (:require [auctions.handlers :as auction]
             [auctions.migration :refer [migrate]]
-            [auctions.spec :refer [auction-id-schema auction-schema
-                                   create-auction-schema list-of-auctions-schema]]
+            [auctions.spec :refer [AuctionId AuctionResult
+                                   Auction ListOfAuctions]]
             [auctions.store :as store :refer [db-from-ds jdbc-database-url]]
             [muuntaja.core :as m]
             [next.jdbc :as jdbc] ;[reitit.coercion.schema :as rcs]
@@ -29,17 +29,17 @@
                                     :version     "1.0.0"}}
                         :handler (swagger/create-swagger-handler)}}]
      ["/auctions" {:get     {:summary "Retrieves the collection of Auction resources."
-                             :responses {200 {:body list-of-auctions-schema}}
+                             :responses {200 {:body ListOfAuctions}}
                              :handler (partial auction/list-all-auctions db)}
                    :post    {:summary "Creates a Auction resource."
-                             :body   create-auction-schema
+                             :body   Auction
                              :handler (partial auction/create-auction db)}
                    :options (fn [_] {:status 200})}]
-     ["/auctions/:id" {:parameters {:path {:id auction-id-schema}}
+     ["/auctions/:id" {:parameters {:path {:id AuctionId}}
                        :get        {:summary "Retrieves a Auction resource."
-                                    :responses {200 {:body auction-schema}}
+                                    :responses {200 {:body AuctionResult}}
                                     :handler (partial auction/retrieve-auction db)}}]
-     ["/auctions/:id/bids" {:parameters {:path {:id auction-id-schema}}
+     ["/auctions/:id/bids" {:parameters {:path {:id AuctionId}}
                             :post        {:summary "Add bid to auction resource."
                                           :handler (partial auction/add-bid-to-auction db)}}]]
     {:data {:muuntaja   m/instance
