@@ -6,11 +6,13 @@
             [auctions.store :as store :refer [db-from-ds jdbc-database-url]]
             [muuntaja.core :as m]
             [next.jdbc :as jdbc]
-            [reitit.coercion.malli :as rcm]
+            [reitit.coercion.malli :as coercion-malli]
             [malli.util :as mu]
             [reitit.ring :as ring]
-            [reitit.ring.coercion :as rrc]
-            [reitit.ring.middleware.muuntaja :as rrmm]
+            [reitit.ring.coercion :as coercion]
+            [reitit.ring.middleware.muuntaja :as muuntaja]
+            [reitit.ring.middleware.exception :as exception]
+            [reitit.ring.middleware.parameters :as parameters]
             [reitit.swagger :as swagger]
             [reitit.swagger-ui :as swagger-ui]
             [ring.adapter.jetty :as jetty]
@@ -37,7 +39,7 @@
                    :options (fn [_] {:status 200})}]
      ["/auctions/:id" {:parameters {:path {:id AuctionId}}
                        :get        {:summary "Retrieves a Auction resource."
-                                    :responses {200 {:body AuctionResult} 
+                                    :responses {200 {:body AuctionResult}
                                                 404 {:body nil}}
                                     :handler (partial auction/retrieve-auction db)}}]
      ["/auctions/:id/bids" {:parameters {:body Bid
@@ -45,17 +47,16 @@
                             :post        {:summary "Add bid to auction resource."
                                           :responses {200 {:body AuctionResult}
                                                       400 {:body nil}
-                                                      404 {:body nil}
-                                                      }
+                                                      404 {:body nil}}
                                           :handler (partial auction/add-bid-to-auction db)}}]]
     {:data {:muuntaja   m/instance
-            :coercion   (rcm/create
-                         {:transformers {:body {:default rcm/default-transformer-provider
-                                                :formats {"application/json" rcm/json-transformer-provider}}
-                                         :string {:default rcm/string-transformer-provider}
-                                         :response {:default rcm/default-transformer-provider}}
+            :coercion   (coercion-malli/create
+                         {:transformers {:body {:default coercion-malli/default-transformer-provider
+                                                :formats {"application/json" coercion-malli/json-transformer-provider}}
+                                         :string {:default coercion-malli/string-transformer-provider}
+                                         :response {:default coercion-malli/default-transformer-provider}}
                            ;; set of keys to include in error messages
-                          :error-keys #{ #_:type #_:coercion :in #_:schema :value #_:errors :humanized #_:transformed}
+                          :error-keys #{#_:type #_:coercion :in #_:schema :value #_:errors :humanized #_:transformed}
                            ;; support lite syntax?
                           :lite true
                            ;; schema identity function (default: close all map schemas)
@@ -72,10 +73,18 @@
                           :encode-error nil
                            ;; malli options
                           :options nil})
-            :middleware [rrmm/format-middleware
-                         rrc/coerce-exceptions-middleware
-                         rrc/coerce-response-middleware
-                         rrc/coerce-request-middleware
+            :middleware [;; 
+                         muuntaja/format-middleware
+                         ;; query-params & form-params
+                         parameters/parameters-middleware
+                         ;; coercing exceptions
+                         coercion/coerce-exceptions-middleware
+                         ;; coercing response bodys
+                         coercion/coerce-response-middleware
+                         ;; coercing request parameters
+                         coercion/coerce-request-middleware
+                         ;; exception handling
+                         exception/exception-middleware
                          [wrap-cors :access-control-allow-origin  #".*"
                           :access-control-allow-methods [:get :put :post :patch :delete]]]}})
    (ring/routes
