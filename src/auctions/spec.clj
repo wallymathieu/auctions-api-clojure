@@ -2,7 +2,7 @@
   (:require [malli.core :as m]))
 (def non-empty-string
   (m/schema [:string {:min 1}]))
-(def date-regex  #"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z") ;2023-03-15T11:50:55Z
+(def date-regex  #"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?") ;2023-03-15T11:50:55Z
 (def date-schema (m/schema [:re date-regex]))
 (def auction-id-schema (m/schema :int))
 
@@ -22,25 +22,19 @@
    [:startsAt date-schema]
    [:expiry date-schema]
    [:seller non-empty-string]
-   [:currency currency-schema]])
+   [:currency currency-schema]
+   [:reservePrice {:optional true} :int]
+   [:minRaise {:optional true} :int]
+   ])
 (def create-auction-schema
-  (m/schema [ :map
-             [:title non-empty-string]
-             [:startsAt date-schema]
-             [:expiry date-schema]
-             [:seller non-empty-string]
-             [:currency currency-schema]]))
-
+  (m/schema (into [:map]
+                  base-auction-parts)))
 (def auction-schema
-  (m/schema [:map
-             [:id {:optional true} auction-id-schema]
-             [:url {:optional true} :string]
-             [:bids {:optional true} [:vector bid-schema]]
-             [:title non-empty-string]
-             [:startsAt date-schema]
-             [:expiry date-schema]
-             [:seller non-empty-string]
-             [:currency currency-schema]]))
+  (m/schema (into [:map
+                   [:id {:optional true} auction-id-schema]
+                   [:url {:optional true} :string]
+                   [:bids {:optional true} [:vector bid-schema]]]
+                  base-auction-parts)))
 (def list-of-auctions-schema (m/schema [:vector auction-schema]))
 
 

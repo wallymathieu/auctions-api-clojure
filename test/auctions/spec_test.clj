@@ -13,7 +13,7 @@
                                             :url "https://localhost/auctions/1",
                                             :bids []})
       invalid-auction-without-seller (dissoc  valid-auction :seller)
-      invalid-auction-with-local-time (merge valid-auction {:startsAt "2023-03-15T11:50:55" :expiry "2023-03-14T11:50:55"})
+      invalid-auction-with-wrong-time (merge valid-auction {:startsAt "2023-03-15T1:50:55" :expiry "2023-03-1411:50:55"})
       invalid-auction-without-currency (dissoc  valid-auction :currency)
 
       invalid-auction {}]
@@ -27,7 +27,7 @@
     (testing "invalid auction"
       (is (false? (m/validate auction-schema invalid-auction)))
       (is (false? (m/validate auction-schema invalid-auction-without-seller)))
-      (is (false? (m/validate auction-schema invalid-auction-with-local-time)))
+      (is (false? (m/validate auction-schema invalid-auction-with-wrong-time)))
       (is (false? (m/validate auction-schema invalid-auction-without-currency))))
     (testing "a valid auction"
       (is (true? (m/validate auction-schema valid-auction)))
