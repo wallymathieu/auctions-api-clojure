@@ -4,30 +4,31 @@
             [malli.core :as m]))
 
 (let [valid-user "BuyerOrSeller|1|test@test.se"
-      invalid-user "test"
       valid-auction {:title "auction"
-                     :startsAt "2023-03-15T11:50:55"
-                     :expiry "2023-03-16T11:50:55"
-                     :user valid-user
+                     :startsAt "2023-03-15T11:50:55Z"
+                     :expiry "2023-03-16T11:50:55Z"
+                     :seller valid-user
                      :currencyCode "SEK"}
-      invalid-auction2 (merge valid-auction {:user invalid-user})
+      valid-auction-with-url-and-bids (merge valid-auction {:id 1,
+                                            :url "https://localhost/auctions/1",
+                                            :bids []})
+      invalid-auction-without-seller (dissoc  valid-auction :seller)
+      invalid-auction-with-local-time (merge valid-auction {:startsAt "2023-03-15T11:50:55" :expiry "2023-03-14T11:50:55"})
+      invalid-auction-without-currency (dissoc  valid-auction :currencyCode)
+
       invalid-auction {}]
 
   (deftest schema-spec
-    (testing "user schema is a schema"
-      (is (= true (m/schema? user-schema))))
     (testing "auction id schema is a schema"
-      (is (= true (m/schema? auction-id-schema))))
-
-    (testing "invalid user"
-      (is (= false (m/validate user-schema invalid-user))))
-    (testing "valid user"
-      (is (= true (m/validate user-schema valid-user))))
+      (is (true? (m/schema? auction-id-schema))))
 
     (testing "auction schema is a schema"
-      (is (= true (m/schema? auction-schema))))
+      (is (true? (m/schema? auction-schema))))
     (testing "invalid auction"
-      (is (= false (m/validate auction-schema invalid-auction)))
-      (is (= false (m/validate auction-schema invalid-auction2))))
+      (is (false? (m/validate auction-schema invalid-auction)))
+      (is (false? (m/validate auction-schema invalid-auction-without-seller)))
+      (is (false? (m/validate auction-schema invalid-auction-with-local-time)))
+      (is (false? (m/validate auction-schema invalid-auction-without-currency))))
     (testing "a valid auction"
-      (is (= true (m/validate auction-schema valid-auction))))))
+      (is (true? (m/validate auction-schema valid-auction)))
+      (is (true? (m/validate auction-schema valid-auction-with-url-and-bids))))))

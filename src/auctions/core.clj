@@ -1,7 +1,9 @@
 (ns auctions.core
   (:require [auctions.handlers :as auction]
             [auctions.migration :refer [migrate]]
-            [auctions.spec :refer [auction-id-schema auction-schema]]
+            [auctions.spec :refer [auction-id-schema auction-schema
+                                   list-of-auctions-schema
+                                   ]]
             [auctions.store :as store :refer [db-from-ds jdbc-database-url]]
             [muuntaja.core :as m]
             [next.jdbc :as jdbc] ;[reitit.coercion.schema :as rcs]
@@ -28,6 +30,7 @@
                                     :version     "1.0.0"}}
                         :handler (swagger/create-swagger-handler)}}]
      ["/auctions" {:get     {:summary "Retrieves the collection of Auction resources."
+                            ; :responses {200 {:body list-of-auctions-schema}}
                              :handler (partial auction/list-all-auctions db)}
                    :post    {:summary "Creates a Auction resource."
                              :body   auction-schema

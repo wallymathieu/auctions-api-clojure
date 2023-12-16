@@ -15,7 +15,10 @@
 
 (deftest test-resource
   (let [auction-id (-> (request db :post seller "/auctions" sample-auction) :body :id)
-        expected-auction (merge sample-auction {:id auction-id, :url (str "https://localhost/auctions/" auction-id), :seller "a1", :bids [{:bidder "a2", :amount 10}]})]
+        expected-auction (merge sample-auction {:id auction-id, 
+                                                :url (str "https://localhost/auctions/" auction-id), 
+                                                :seller "a1",
+                                                :bids [{:bidder "a2", :amount 10}]})]
     (is (= 1
            auction-id))
     (is (= {:status 200 :body expected-auction}
