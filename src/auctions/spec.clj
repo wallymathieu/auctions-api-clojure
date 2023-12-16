@@ -13,20 +13,34 @@
 ;  (m/schema [:re user-regex]))
 (def amount-schema
   (m/schema [:re amount-regex]))
-(def auction-schema
+(def bid-schema
   (m/schema [:map
-             [:id {:optional true} auction-id-schema]
-             [:url {:optional true} :string]
-             [:bids {:optional true} [:vector [:map
-                                                 ;[:id {:optional true} auction-id-schema]
-                                                 [:amount amount-schema]
-                                                 [:bidder non-empty-string]
-                                               ]]]
+             [:amount amount-schema]
+             [:bidder non-empty-string]]))
+(def base-auction-parts
+  [[:title non-empty-string]
+   [:startsAt date-schema]
+   [:expiry date-schema]
+   [:seller non-empty-string]
+   [:currency currency-schema]])
+(def create-auction-schema
+  (m/schema [ :map
              [:title non-empty-string]
              [:startsAt date-schema]
              [:expiry date-schema]
              [:seller non-empty-string]
-             [:currencyCode currency-schema]]))
+             [:currency currency-schema]]))
+
+(def auction-schema
+  (m/schema [:map
+             [:id {:optional true} auction-id-schema]
+             [:url {:optional true} :string]
+             [:bids {:optional true} [:vector bid-schema]]
+             [:title non-empty-string]
+             [:startsAt date-schema]
+             [:expiry date-schema]
+             [:seller non-empty-string]
+             [:currency currency-schema]]))
 (def list-of-auctions-schema (m/schema [:vector auction-schema]))
 
 

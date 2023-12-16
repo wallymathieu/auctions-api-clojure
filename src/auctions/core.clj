@@ -1,9 +1,7 @@
 (ns auctions.core
   (:require [auctions.handlers :as auction]
             [auctions.migration :refer [migrate]]
-            [auctions.spec :refer [auction-id-schema auction-schema
-                                   list-of-auctions-schema
-                                   ]]
+            [auctions.spec :refer [auction-id-schema create-auction-schema]]
             [auctions.store :as store :refer [db-from-ds jdbc-database-url]]
             [muuntaja.core :as m]
             [next.jdbc :as jdbc] ;[reitit.coercion.schema :as rcs]
@@ -33,7 +31,7 @@
                             ; :responses {200 {:body list-of-auctions-schema}}
                              :handler (partial auction/list-all-auctions db)}
                    :post    {:summary "Creates a Auction resource."
-                             :body   auction-schema
+                             :body   create-auction-schema
                              :handler (partial auction/create-auction db)}
                    :options (fn [_] {:status 200})}]
      ["/auctions/:id" {:parameters {:path {:id auction-id-schema}}
