@@ -35,6 +35,7 @@
       (is (false? (m/validate AuctionResult invalid-auction-without-currency))))
     (testing "a valid auction"
       (is (true? (m/validate AuctionResult valid-auction)))
+      (is (= valid-auction (m/coerce AuctionResult valid-auction)))
       ; (is (true? (m/validate auction-schema valid-auction-with-local-time)))
       ; (is (true? (m/validate auction-schema valid-auction-with-zoned-time)))
       (is (true? (m/validate AuctionResult valid-auction-with-url-and-bids))))))

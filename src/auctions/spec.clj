@@ -7,6 +7,7 @@
    (mr/composite-registry
     (m/default-schemas)
     (met/schemas))))
+
 (def ^:private non-empty-string
   (m/schema [:string {:min 1}]))
 (def ^:private date-regex  #"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?") ;2023-03-15T11:50:55Z
