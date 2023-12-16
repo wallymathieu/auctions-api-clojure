@@ -16,20 +16,19 @@
 
 (def Currency (m/schema [:enum "VAC" "SEK" "DKK"]))
 ;(def user-regex #"\w*\|[^|]*\|.*?")
-(def ^:private amount-regex #"[A-Z]+[0-9]+")
 ;(def user-schema
 ;  (m/schema [:re user-regex]))
-(def Amount
-  (m/schema [:re amount-regex]))
 (def Bid
   (m/schema [:map
-             [:amount Amount]
+             [:amount :int]]))
+(def BidResult
+  (m/schema [:map
+             [:amount :int]
              [:bidder non-empty-string]]))
 (def ^:private base-auction-parts
   [[:title non-empty-string]
    [:startsAt DateTime]
    [:expiry DateTime]
-   [:seller non-empty-string]
    [:currency Currency]
    [:reservePrice {:optional true} :int]
    [:minRaise {:optional true} :int]])
@@ -37,10 +36,12 @@
   (m/schema (into [:map]
                   base-auction-parts)))
 (def AuctionResult
-  (m/schema (into [:map
+  (m/schema (into [:map 
+                   [:seller non-empty-string]
                    [:id {:optional true} AuctionId]
                    [:url {:optional true} :string]
-                   [:bids {:optional true} [:vector Bid]]]
+                   [:bids {:optional true} [:vector BidResult]]]
                   base-auction-parts)))
+
 (def ListOfAuctions (m/schema [:vector AuctionResult]))
 

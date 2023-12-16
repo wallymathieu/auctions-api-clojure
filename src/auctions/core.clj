@@ -1,8 +1,8 @@
 (ns auctions.core
   (:require [auctions.handlers :as auction]
             [auctions.migration :refer [migrate]]
-            [auctions.spec :refer [AuctionId AuctionResult
-                                   Auction ListOfAuctions]]
+            [auctions.spec :refer [Auction AuctionId AuctionResult
+                                   Bid ListOfAuctions]]
             [auctions.store :as store :refer [db-from-ds jdbc-database-url]]
             [muuntaja.core :as m]
             [next.jdbc :as jdbc]
@@ -13,8 +13,7 @@
             [reitit.swagger :as swagger]
             [reitit.swagger-ui :as swagger-ui]
             [ring.adapter.jetty :as jetty]
-            [ring.middleware.cors :refer [wrap-cors]]
-))
+            [ring.middleware.cors :refer [wrap-cors]]))
 
 
 (defn app-routes [db]
@@ -32,7 +31,7 @@
                              :responses {200 {:body ListOfAuctions}}
                              :handler (partial auction/list-all-auctions db)}
                    :post    {:summary "Creates a Auction resource."
-                             :body   Auction
+                             :parameters {:body Auction}
                              :handler (partial auction/create-auction db)}
                    :options (fn [_] {:status 200})}]
      ["/auctions/:id" {:parameters {:path {:id AuctionId}}
@@ -40,8 +39,13 @@
                                     :responses {200 {:body AuctionResult} 
                                                 404 {:body nil}}
                                     :handler (partial auction/retrieve-auction db)}}]
-     ["/auctions/:id/bids" {:parameters {:path {:id AuctionId}}
+     ["/auctions/:id/bids" {:parameters {:body Bid
+                                         :path {:id AuctionId}}
                             :post        {:summary "Add bid to auction resource."
+                                          :responses {200 {:body AuctionResult}
+                                                      400 {:body AuctionResult}
+                                                      404 {:body nil}
+                                                      }
                                           :handler (partial auction/add-bid-to-auction db)}}]]
     {:data {:muuntaja   m/instance
             :coercion   rcm/coercion

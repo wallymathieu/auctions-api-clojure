@@ -1,5 +1,6 @@
 (ns auctions.spec-test
-  (:require [auctions.spec :refer [AuctionId AuctionResult]]
+  (:require [auctions.samples :refer [sample-auction]]
+            [auctions.spec :refer [Auction AuctionId AuctionResult]]
             [clojure.test :refer [deftest is testing]]
             [malli.core :as m])
   ;(:import (java.time LocalDateTime ZonedDateTime))
@@ -35,6 +36,7 @@
       (is (false? (m/validate AuctionResult invalid-auction-without-currency))))
     (testing "a valid auction"
       (is (true? (m/validate AuctionResult valid-auction)))
+      (is (true? (m/validate Auction sample-auction)))
       (is (= valid-auction (m/coerce AuctionResult valid-auction)))
       ; (is (true? (m/validate auction-schema valid-auction-with-local-time)))
       ; (is (true? (m/validate auction-schema valid-auction-with-zoned-time)))

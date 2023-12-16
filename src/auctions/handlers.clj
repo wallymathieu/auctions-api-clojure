@@ -59,8 +59,9 @@
   (if-authorized request
                  (fn [user]
                    (let [id (-> parameters :path :id)
-                         bid-with-user (merge body-params {:bidder (get user "sub") :at (java.time.LocalDateTime/now)})]
+                         bid-with-user (merge body-params {:bidder (get user "sub") 
+                                                           :at (java.time.LocalDateTime/now)})]
                      (-> (store/add-bid db bid-with-user id)
                          (append-auction-url-and-convert-timestamps request)
-                         rr/response)))))
+                         nil-response-if-not-found)))))
 

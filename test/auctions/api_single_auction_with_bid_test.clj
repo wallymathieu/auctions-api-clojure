@@ -22,4 +22,9 @@
     (is (= 1
            auction-id))
     (is (= {:status 200 :body expected-auction}
-           (request db :post buyer (str "/auctions/" auction-id "/bids") {:amount 10})))))
+           (request db :post buyer (str "/auctions/" auction-id "/bids") {:amount 10})))
+    ;(is (= {:status 400 :body nil}
+    ;       (request db :post buyer (str "/auctions/" auction-id "/bids") {})))
+    ;(is (= {:status 404 :body nil}
+    ;       (request db :post buyer (str "/auctions/" 99 "/bids") {:amount 10})))
+    ))
