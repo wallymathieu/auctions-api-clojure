@@ -17,7 +17,7 @@ $ docker run --name some-postgres -e POSTGRES_DB=auctions -e POSTGRES_PASSWORD=m
 
 ```
 $ export JDBC_DATABASE_URL="jdbc:postgresql://localhost/auctions?user=postgres&password=mypass"
-$ clj -m auctions.core 3000
+$ clj -M -m auctions.core 3000
 ```
 
 If that port is in use, start it on a different port. For example, port 8100:

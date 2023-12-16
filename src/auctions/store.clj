@@ -40,9 +40,12 @@
   (get-auction db id))
 
 (defn add-bid [db body id]
-  (sql/insert! db :bids (merge (as-row body) {:auctionId id}))
-  (get-auction db id))
-
+  (let [auction-id (-> (get-auction db id) :id)]
+    (if-not (nil? auction-id)
+      (do
+        (sql/insert! db :bids (merge (as-row body) {:auctionId id}))
+        (get-auction db id))
+      nil)))
 
 (defn get-all-auctions [db]
   (get-auctions-sql db ["SELECT * FROM auctions"] ["SELECT * FROM bids"]))
