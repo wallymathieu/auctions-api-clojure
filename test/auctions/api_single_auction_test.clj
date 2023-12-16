@@ -20,9 +20,8 @@
            auction-id))
     (is (= {:status 200 :body expected-auction}
            (request db :get seller (str "/auctions/" auction-id))))
-    ; TODO:
-    ;(is (= {:status 404 :body nil}
-    ;       (request :get seller (str "/auctions/" 99))))
+    (is (= {:status 404 :body nil}
+           (request db :get seller (str "/auctions/" 99))))
     (is (= {:status 403 :body {:cause "not-authorized"}}
            (request db :post nil "/auctions" sample-auction)))
     (is (= {:status 200 :body [expected-auction]}

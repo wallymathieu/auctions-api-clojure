@@ -5,7 +5,7 @@
                                    Auction ListOfAuctions]]
             [auctions.store :as store :refer [db-from-ds jdbc-database-url]]
             [muuntaja.core :as m]
-            [next.jdbc :as jdbc] ;[reitit.coercion.schema :as rcs]
+            [next.jdbc :as jdbc]
             [reitit.coercion.malli :as rcm]
             [reitit.ring :as ring]
             [reitit.ring.coercion :as rrc]
@@ -13,7 +13,7 @@
             [reitit.swagger :as swagger]
             [reitit.swagger-ui :as swagger-ui]
             [ring.adapter.jetty :as jetty]
-            [ring.middleware.cors :refer [wrap-cors]] ;[schema.core :as s]
+            [ring.middleware.cors :refer [wrap-cors]]
 ))
 
 
@@ -37,7 +37,8 @@
                    :options (fn [_] {:status 200})}]
      ["/auctions/:id" {:parameters {:path {:id AuctionId}}
                        :get        {:summary "Retrieves a Auction resource."
-                                    :responses {200 {:body AuctionResult}}
+                                    :responses {200 {:body AuctionResult} 
+                                                404 {:body nil}}
                                     :handler (partial auction/retrieve-auction db)}}]
      ["/auctions/:id/bids" {:parameters {:path {:id AuctionId}}
                             :post        {:summary "Add bid to auction resource."

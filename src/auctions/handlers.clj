@@ -1,7 +1,8 @@
 (ns auctions.handlers
   (:require [ring.util.response :as rr]
             [clojure.data.json :as json]
-            [auctions.store :as store]))
+            [auctions.store :as store]
+            [auctions.handlers :as auction]))
 
 (defn decode64 [to-decode]
   (if (some? to-decode)
@@ -15,19 +16,22 @@
     (cond
       (or (not auth-header) (not decoded))
       {:status 403 :body {:cause :not-authorized}}
-       :else
+      :else
       (callback decoded))))
 (defn- timestamp-to-string [timestamp]
   (if-not (nil? timestamp)  (str (.toInstant  timestamp))  nil))
+(defn- nil-response-if-not-found [auction]
+  (if-not (nil? auction)  (rr/response auction)  (rr/not-found nil)))
 (defn- append-auction-url-and-convert-timestamps [auction request]
   (let [host (-> request :headers (get "host" "localhost"))
         scheme (name (:scheme request))
         id (:id auction)
         startsAt (:startsAt auction)
         expiry (:expiry auction)]
-    (merge auction {:url (str scheme "://" host "/auctions/" id)
-                    :startsAt (timestamp-to-string startsAt)
-                    :expiry (timestamp-to-string expiry)})))
+    (if (nil? id) nil
+        (merge auction {:url (str scheme "://" host "/auctions/" id)
+                        :startsAt (timestamp-to-string startsAt)
+                        :expiry (timestamp-to-string expiry)}))))
 
 (defn list-all-auctions [db request]
   (if-authorized request
@@ -49,7 +53,7 @@
   (let [id (-> parameters :path :id)]
     (-> (store/get-auction db id)
         (append-auction-url-and-convert-timestamps request)
-        rr/response)))
+        nil-response-if-not-found)))
 
 (defn add-bid-to-auction [db {:keys [parameters, body-params] :as request}]
   (if-authorized request
