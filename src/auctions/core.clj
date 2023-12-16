@@ -44,7 +44,7 @@
                                          :path {:id AuctionId}}
                             :post        {:summary "Add bid to auction resource."
                                           :responses {200 {:body AuctionResult}
-                                                      400 {:body AuctionResult}
+                                                      400 {:body nil}
                                                       404 {:body nil}
                                                       }
                                           :handler (partial auction/add-bid-to-auction db)}}]]
