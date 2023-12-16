@@ -1,11 +1,12 @@
 (ns auctions.spec
   (:require [malli.core :as m]
-            [malli.registry :as mr]
-            [malli.experimental.time :as met]))
-(mr/set-default-registry!
- (mr/composite-registry
-  (m/default-schemas)
-  (met/schemas)))
+            ;[malli.registry :as mr]
+            ;[malli.experimental.time :as met]
+            ))
+(comment (mr/set-default-registry!
+   (mr/composite-registry
+    (m/default-schemas)
+    (met/schemas))))
 (def ^:private non-empty-string
   (m/schema [:string {:min 1}]))
 (def ^:private date-regex  #"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?") ;2023-03-15T11:50:55Z
