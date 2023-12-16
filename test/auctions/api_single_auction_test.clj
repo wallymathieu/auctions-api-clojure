@@ -14,10 +14,14 @@
 
 
 (deftest test-resource
-  (let [auction-id (-> (request db :post seller "/auctions" sample-auction) :body :id)
+  (let [auction-response (request db :post seller "/auctions" sample-auction)
+        auction-id (-> auction-response :body :id)
         expected-auction (merge sample-auction {:id auction-id, :url (str "https://localhost/auctions/" auction-id), :seller "a1", :bids []})]
     (is (= 1
            auction-id))
+    ;(is (= {:status 200 :body expected-auction}
+    ;       auction-response))
+
     (is (= {:status 200 :body expected-auction}
            (request db :get seller (str "/auctions/" auction-id))))
     (is (= {:status 404 :body nil}

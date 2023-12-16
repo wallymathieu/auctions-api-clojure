@@ -4,9 +4,9 @@
             ;[malli.experimental.time :as met]
             ))
 (comment (mr/set-default-registry!
-   (mr/composite-registry
-    (m/default-schemas)
-    (met/schemas))))
+          (mr/composite-registry
+           (m/default-schemas)
+           (met/schemas))))
 
 (def ^:private non-empty-string
   (m/schema [:string {:min 1}]))
@@ -36,7 +36,7 @@
   (m/schema (into [:map]
                   base-auction-parts)))
 (def AuctionResult
-  (m/schema (into [:map 
+  (m/schema (into [:map
                    [:seller non-empty-string]
                    [:id {:optional true} AuctionId]
                    [:url {:optional true} :string]

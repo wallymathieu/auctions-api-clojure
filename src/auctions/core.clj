@@ -7,6 +7,7 @@
             [muuntaja.core :as m]
             [next.jdbc :as jdbc]
             [reitit.coercion.malli :as rcm]
+            [malli.util :as mu]
             [reitit.ring :as ring]
             [reitit.ring.coercion :as rrc]
             [reitit.ring.middleware.muuntaja :as rrmm]
@@ -48,7 +49,29 @@
                                                       }
                                           :handler (partial auction/add-bid-to-auction db)}}]]
     {:data {:muuntaja   m/instance
-            :coercion   rcm/coercion
+            :coercion   (rcm/create
+                         {:transformers {:body {:default rcm/default-transformer-provider
+                                                :formats {"application/json" rcm/json-transformer-provider}}
+                                         :string {:default rcm/string-transformer-provider}
+                                         :response {:default rcm/default-transformer-provider}}
+                           ;; set of keys to include in error messages
+                          :error-keys #{ #_:type #_:coercion :in #_:schema :value #_:errors :humanized #_:transformed}
+                           ;; support lite syntax?
+                          :lite true
+                           ;; schema identity function (default: close all map schemas)
+                          :compile mu/closed-schema
+                           ;; validate request & response
+                          :validate true
+                           ;; top-level short-circuit to disable request & response coercion
+                          :enabled true
+                           ;; strip-extra-keys (affects only predefined transformers)
+                          :strip-extra-keys true
+                           ;; add/set default values
+                          :default-values true
+                           ;; encode-error
+                          :encode-error nil
+                           ;; malli options
+                          :options nil})
             :middleware [rrmm/format-middleware
                          rrc/coerce-exceptions-middleware
                          rrc/coerce-response-middleware
