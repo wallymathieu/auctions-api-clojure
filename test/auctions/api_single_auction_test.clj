@@ -16,11 +16,13 @@
 (deftest test-resource
   (let [auction-response (request db :post seller "/auctions" sample-auction)
         auction-id (-> auction-response :body :id)
+        auction-without-currency-response (request db :post seller "/auctions" (dissoc sample-auction :currency))
         expected-auction (merge sample-auction {:id auction-id, :url (str "https://localhost/auctions/" auction-id), :seller "a1", :bids []})]
     (is (= 1
            auction-id))
-    ;(is (= {:status 200 :body expected-auction}
-    ;       auction-response))
+    (is (= 400 (:status auction-without-currency-response)))
+    (is (= {:currency ["missing required key"]}
+       (-> auction-without-currency-response :body :humanized)))
 
     (is (= {:status 200 :body expected-auction}
            (request db :get seller (str "/auctions/" auction-id))))
