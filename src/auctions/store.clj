@@ -7,20 +7,20 @@
 
 (defn db-from-ds [ds] (jdbc/with-options ds {:builder-fn rs/as-unqualified-lower-maps}))
 
-(defn as-row [row]
+(defn- as-row [row]
   (rename-keys row {:order :position, :expiry :endsAt}))
 
-(defn as-auction [row]
+(defn- as-auction [row]
   (dissoc (rename-keys row {:position :order, :startsat :startsAt, :endsat :expiry}) :timeframe :minraise :reserveprice))
 
-(defn as-bid [row]
+(defn- as-bid [row]
   (dissoc (rename-keys row {:position :order}) :at :id :auctionid))
 
 
 (defn- map-auction-with-bids [bids-for-auction]
   (fn [{:keys [id] :as auction}] (merge auction {:bids (map as-bid (bids-for-auction id))})))
 
-(defn create-auctions [db auction]
+(defn create-auction [db auction]
   (as-auction (sql/insert! db :auctions (as-row auction))))
 
 (defn- get-auctions-sql [db auction-sql-params bids-sql-params]

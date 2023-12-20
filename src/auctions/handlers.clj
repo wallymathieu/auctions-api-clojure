@@ -44,7 +44,7 @@
   (if-authorized request
                  (fn [user]
                    (let [auction-with-user (merge body-params {:seller (get user "sub")})]
-                     (-> (store/create-auctions db auction-with-user)
+                     (-> (store/create-auction db auction-with-user)
                          (append-auction-url-and-convert-timestamps request)
                          rr/response)))))
 
