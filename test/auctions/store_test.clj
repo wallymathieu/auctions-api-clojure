@@ -21,4 +21,6 @@
     (is (= nil not-found))
     (let [auction-with-bid (add-bid db {:bidder "bidder" :amount 100 :at (java.time.LocalDateTime/now)} auction-id)]
       (is (= 1 (:id auction-with-bid)))
-      (is (= 1 (count (:bids auction-with-bid)))))))
+      (is (= 1 (count (:bids auction-with-bid)))))
+    (let [missing-auction (add-bid db {:bidder "bidder" :amount 100 :at (java.time.LocalDateTime/now)} 999)]
+      (is (= nil missing-auction)))))
