@@ -3,6 +3,7 @@
             [next.jdbc :as jdbc]
             [next.jdbc.result-set :as rs]
             [next.jdbc.sql :as sql]))
+
 (def jdbc-database-url (System/getenv "JDBC_DATABASE_URL"))
 
 (defn db-from-ds [ds] (jdbc/with-options ds {:builder-fn rs/as-unqualified-lower-maps}))
@@ -36,16 +37,18 @@
     (first auctions)))
 
 (defn update-auction [db body id]
-  (sql/update! db :auctions (as-row body) {:id id})
-  (get-auction db id))
+  (jdbc/with-transaction [tx db]
+    (do
+      (sql/update! db :auctions (as-row body) {:id id})
+      (get-auction db id))))
 
 (defn add-bid [db body id]
+  (jdbc/with-transaction [tx db]
   (let [auction (get-auction db id)]
-    (if-not (nil? auction)
-      (do
+    (when-not (nil? auction)
         (sql/insert! db :bids (merge (as-row body) {:auctionId id}))
         (get-auction db id))
-      nil)))
+      )))
 
 (defn get-all-auctions [db]
   (get-auctions-sql db ["SELECT * FROM auctions"] ["SELECT * FROM bids"]))
