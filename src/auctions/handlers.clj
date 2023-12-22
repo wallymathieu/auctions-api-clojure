@@ -7,9 +7,8 @@
            [java.time LocalDateTime]))
 
 (defn decode64 [to-decode]
-  (if (some? to-decode)
-    (String. (.decode (Base64/getMimeDecoder) to-decode))
-    nil))
+  (when (some? to-decode)
+    (String. (.decode (Base64/getMimeDecoder) to-decode))))
 
 ; TODO: move to middleware
 ;"sub" "name" "u_typ"
@@ -24,9 +23,8 @@
       (callback decoded))))
 
 (defn- timestamp-to-string [timestamp]
-  (if (some? timestamp)
-    (str (.toInstant  timestamp))
-    nil))
+  (when (some? timestamp)
+    (str (.toInstant  timestamp))))
 
 (defn- nil-response-if-not-found [auction]
   (if (some? auction)
@@ -39,11 +37,10 @@
         id (:id auction)
         startsAt (:startsAt auction)
         expiry (:expiry auction)]
-    (if (some? id)
+    (when (some? id)
       (merge auction {:url (str scheme "://" host "/auctions/" id)
                       :startsAt (timestamp-to-string startsAt)
-                      :expiry (timestamp-to-string expiry)})
-      nil)))
+                      :expiry (timestamp-to-string expiry)}))))
 
 (defn list-all-auctions [db request]
   (if-authorized request
