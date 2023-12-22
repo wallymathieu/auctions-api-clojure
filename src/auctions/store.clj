@@ -44,7 +44,6 @@
     (let [auction (get-auction tx id)]
       (when (some? auction)
         (sql/insert! tx :bids (merge (as-row body) {:auctionId id}))
-        nil
         (get-auction tx id)))))
 
 (defn get-all-auctions [db]
