@@ -22,6 +22,7 @@
 (defn app-routes [db]
   (ring/ring-handler
    (ring/router
+
     [["/swagger.json" {:get
                        {:no-doc  true
                         :swagger
@@ -30,6 +31,7 @@
                                     :description "This is a implementation of the auctions API REST, using Clojure, Ring/Reitit and next-jdbc."
                                     :version     "1.0.0"}}
                         :handler (swagger/create-swagger-handler)}}]
+
      ["/auctions" {:get     {:summary "Retrieves the collection of Auction resources."
                              :responses {200 {:body ListOfAuctions}}
                              :handler (partial auction/list-all-auctions db)}
@@ -37,11 +39,13 @@
                              :parameters {:body Auction}
                              :handler (partial auction/create-auction db)}
                    :options (fn [_] {:status 200})}]
+
      ["/auctions/:id" {:parameters {:path {:id AuctionId}}
                        :get        {:summary "Retrieves a Auction resource."
                                     :responses {200 {:body AuctionResult}
                                                 404 {:body nil}}
                                     :handler (partial auction/retrieve-auction db)}}]
+
      ["/auctions/:id/bids" {:parameters {:body Bid
                                          :path {:id AuctionId}}
                             :post        {:summary "Add bid to auction resource."
@@ -49,6 +53,7 @@
                                                       400 {:body nil}
                                                       404 {:body nil}}
                                           :handler (partial auction/add-bid-to-auction db)}}]]
+
     {:data {:muuntaja   m/instance
             :coercion   (coercion-malli/create
                          {:transformers {:body {:default coercion-malli/default-transformer-provider
