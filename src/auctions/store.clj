@@ -36,18 +36,13 @@
   (let [auctions (get-auctions-sql db ["SELECT * FROM auctions WHERE id = ?" id] ["SELECT * FROM bids WHERE auctionId = ?" id])]
     (first auctions)))
 
-(defn update-auction [db body id]
-  (jdbc/with-transaction [tx db]
-    (do
-      (sql/update! db :auctions (as-row body) {:id id})
-      (get-auction db id))))
-
 (defn add-bid [db body id]
   (jdbc/with-transaction [tx db]
-    (let [auction (get-auction db id)]
+    (let [auction (get-auction tx id)]
       (when (some? auction)
-        (sql/insert! db :bids (merge (as-row body) {:auctionId id}))
-        (get-auction db id)))))
+        (sql/insert! tx :bids (merge (as-row body) {:auctionId id})))))
+  ; NOTE: we return the auction for db, but not from within the transaction
+  (get-auction db id))
 
 (defn get-all-auctions [db]
   (get-auctions-sql db ["SELECT * FROM auctions"] ["SELECT * FROM bids"]))
