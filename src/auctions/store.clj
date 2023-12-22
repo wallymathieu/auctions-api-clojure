@@ -6,7 +6,9 @@
 
 (def jdbc-database-url (System/getenv "JDBC_DATABASE_URL"))
 
-(defn db-from-ds [ds] (jdbc/with-options ds {:builder-fn rs/as-unqualified-lower-maps}))
+(def ^:private db-options {:builder-fn rs/as-unqualified-lower-maps})
+
+(defn db-from-ds [ds] (jdbc/with-options ds db-options))
 
 (defn- as-row [row]
   (rename-keys row {:order :position, :expiry :endsAt}))
@@ -25,8 +27,8 @@
   (as-auction (sql/insert! db :auctions (as-row auction))))
 
 (defn- get-auctions-sql [db auction-sql-params bids-sql-params]
-  (let [auctions (jdbc/execute! db auction-sql-params)
-        bids (jdbc/execute! db bids-sql-params)
+  (let [auctions (jdbc/execute! db auction-sql-params db-options)
+        bids (jdbc/execute! db bids-sql-params db-options)
         mapped-auctions (map as-auction auctions)
         grouped-bids (group-by :auctionid bids)
         bids-for-auction (fn [id] (get grouped-bids id []))]
@@ -36,13 +38,14 @@
   (let [auctions (get-auctions-sql db ["SELECT * FROM auctions WHERE id = ?" id] ["SELECT * FROM bids WHERE auctionId = ?" id])]
     (first auctions)))
 
+
 (defn add-bid [db body id]
   (jdbc/with-transaction [tx db]
     (let [auction (get-auction tx id)]
       (when (some? auction)
-        (sql/insert! tx :bids (merge (as-row body) {:auctionId id})))))
-  ; NOTE: we return the auction for db, but not from within the transaction
-  (get-auction db id))
+        (sql/insert! tx :bids (merge (as-row body) {:auctionId id}))
+        nil
+        (get-auction tx id)))))
 
 (defn get-all-auctions [db]
   (get-auctions-sql db ["SELECT * FROM auctions"] ["SELECT * FROM bids"]))
