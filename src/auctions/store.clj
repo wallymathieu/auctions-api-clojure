@@ -33,7 +33,7 @@
     (map (map-auction-with-bids bids-for-auction) mapped-auctions)))
 
 (defn get-auction [db id]
-  (let [auctions (get-auctions-sql db ["SELECT * FROM auctions WHERE id = ?" id] [ "SELECT * FROM bids WHERE auctionId = ?" id])]
+  (let [auctions (get-auctions-sql db ["SELECT * FROM auctions WHERE id = ?" id] ["SELECT * FROM bids WHERE auctionId = ?" id])]
     (first auctions)))
 
 (defn update-auction [db body id]
@@ -44,11 +44,10 @@
 
 (defn add-bid [db body id]
   (jdbc/with-transaction [tx db]
-  (let [auction (get-auction db id)]
-    (when-not (nil? auction)
+    (let [auction (get-auction db id)]
+      (when-not (nil? auction)
         (sql/insert! db :bids (merge (as-row body) {:auctionId id}))
-        (get-auction db id))
-      )))
+        (get-auction db id)))))
 
 (defn get-all-auctions [db]
   (get-auctions-sql db ["SELECT * FROM auctions"] ["SELECT * FROM bids"]))
