@@ -45,7 +45,7 @@
 (defn add-bid [db body id]
   (jdbc/with-transaction [tx db]
     (let [auction (get-auction db id)]
-      (when-not (nil? auction)
+      (when (some? auction)
         (sql/insert! db :bids (merge (as-row body) {:auctionId id}))
         (get-auction db id)))))
 

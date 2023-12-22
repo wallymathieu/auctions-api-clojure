@@ -24,10 +24,14 @@
       (callback decoded))))
 
 (defn- timestamp-to-string [timestamp]
-  (if-not (nil? timestamp)  (str (.toInstant  timestamp))  nil))
+  (if (some? timestamp)
+    (str (.toInstant  timestamp))
+    nil))
 
 (defn- nil-response-if-not-found [auction]
-  (if-not (nil? auction)  (rr/response auction)  (rr/not-found nil)))
+  (if (some? auction)
+    (rr/response auction)
+    (rr/not-found nil)))
 
 (defn- append-auction-url-and-convert-timestamps [auction request]
   (let [host (-> request :headers (get "host" "localhost"))
@@ -35,10 +39,11 @@
         id (:id auction)
         startsAt (:startsAt auction)
         expiry (:expiry auction)]
-    (if (nil? id) nil
-        (merge auction {:url (str scheme "://" host "/auctions/" id)
-                        :startsAt (timestamp-to-string startsAt)
-                        :expiry (timestamp-to-string expiry)}))))
+    (if (some? id)
+      (merge auction {:url (str scheme "://" host "/auctions/" id)
+                      :startsAt (timestamp-to-string startsAt)
+                      :expiry (timestamp-to-string expiry)})
+      nil)))
 
 (defn list-all-auctions [db request]
   (if-authorized request
@@ -65,7 +70,7 @@
   (if-authorized request
                  (fn [user]
                    (let [id (-> parameters :path :id)
-                         bid-with-user (merge body-params {:bidder (get user "sub") 
+                         bid-with-user (merge body-params {:bidder (get user "sub")
                                                            :at (LocalDateTime/now)})]
                      (-> (store/add-bid db bid-with-user id)
                          (append-auction-url-and-convert-timestamps request)
