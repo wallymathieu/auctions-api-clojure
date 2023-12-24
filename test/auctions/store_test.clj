@@ -1,7 +1,7 @@
 (ns auctions.store-test
   (:require [auctions.migration :refer [migrate]]
             [auctions.samples :refer [sample-auction]]
-            [auctions.store :refer [add-bid create-auction db-from-ds
+            [auctions.store :refer [add-bid create-auction
                                     get-auction]]
             [clojure.test :refer [deftest is]]
             [next.jdbc :as jdbc])
@@ -9,8 +9,7 @@
 
 (def db-config {:dbtype "h2:mem" :dbname "store-tests"})
 
-(def ds (jdbc/get-datasource db-config))
-(def db (db-from-ds ds))
+(def db (jdbc/get-datasource db-config))
 (migrate db-config)
 
 (deftest test-resource

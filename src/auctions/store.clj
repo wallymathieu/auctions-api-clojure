@@ -8,8 +8,6 @@
 
 (def ^:private db-options {:builder-fn rs/as-unqualified-lower-maps})
 
-(defn db-from-ds [ds] (jdbc/with-options ds db-options))
-
 (defn- as-row [row]
   (rename-keys row {:order :position, :expiry :endsAt}))
 
@@ -19,12 +17,11 @@
 (defn- as-bid [row]
   (dissoc (rename-keys row {:position :order}) :at :id :auctionid))
 
-
 (defn- map-auction-with-bids [bids-for-auction]
   (fn [{:keys [id] :as auction}] (merge auction {:bids (map as-bid (bids-for-auction id))})))
 
 (defn create-auction [db auction]
-  (as-auction (sql/insert! db :auctions (as-row auction))))
+  (as-auction (sql/insert! db :auctions (as-row auction) db-options)))
 
 (defn- get-auctions-sql [db auction-sql-params bids-sql-params]
   (let [auctions (jdbc/execute! db auction-sql-params db-options)
@@ -43,7 +40,7 @@
   (jdbc/with-transaction [tx db]
     (let [auction (get-auction tx id)]
       (when (some? auction)
-        (sql/insert! tx :bids (merge (as-row body) {:auctionId id}))
+        (sql/insert! tx :bids (merge (as-row body) {:auctionId id}) db-options)
         (get-auction tx id)))))
 
 (defn get-all-auctions [db]

@@ -3,7 +3,7 @@
             [auctions.migration :refer [migrate]]
             [auctions.spec :refer [Auction AuctionId AuctionResult
                                    Bid ListOfAuctions]]
-            [auctions.store :as store :refer [db-from-ds jdbc-database-url]]
+            [auctions.store :as store :refer [jdbc-database-url]]
             [muuntaja.core :as m]
             [next.jdbc :as jdbc]
             [reitit.coercion.malli :as coercion-malli]
@@ -98,8 +98,7 @@
     {:not-found (constantly {:status 404 :body "Not found"})})))
 
 (defn -main [port]
-  (let [ds (jdbc/get-datasource jdbc-database-url)
-        db (db-from-ds ds)
+  (let [db (jdbc/get-datasource jdbc-database-url)
         routes (#'app-routes db)]
     (migrate jdbc-database-url)
     (jetty/run-jetty routes {:port (Integer. port)
@@ -107,8 +106,7 @@
 
 (comment
   (def server
-    (let [ds (jdbc/get-datasource jdbc-database-url)
-          db (db-from-ds ds)
+    (let [db (jdbc/get-datasource jdbc-database-url)
           routes (#'app-routes db)]
       (jetty/run-jetty #'routes {:port 3000
                                  :join? false}))))

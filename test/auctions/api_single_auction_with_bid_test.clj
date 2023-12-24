@@ -2,14 +2,12 @@
   (:require [auctions.api-helpers :refer [request]]
             [auctions.migration :refer [migrate]]
             [auctions.samples :refer [buyer sample-auction seller]]
-            [auctions.store :refer [db-from-ds]]
             [clojure.test :refer [deftest is]]
             [next.jdbc :as jdbc]))
 
 (def db-config {:dbtype "h2:mem" :dbname "single-auction-with-bids-tests"})
 
-(def ds (jdbc/get-datasource db-config))
-(def db (db-from-ds ds))
+(def db (jdbc/get-datasource db-config))
 (migrate db-config)
 
 
