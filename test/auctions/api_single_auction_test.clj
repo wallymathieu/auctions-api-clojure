@@ -3,7 +3,7 @@
             [auctions.migration :refer [migrate]]
             [auctions.samples :refer [buyer sample-auction seller]]
             [auctions.store :refer [db-from-ds]]
-            [clojure.test :refer :all]
+            [clojure.test :refer [deftest is]]
             [next.jdbc :as jdbc]))
 
 (def db-config {:dbtype "h2:mem" :dbname "single-auction-tests"})

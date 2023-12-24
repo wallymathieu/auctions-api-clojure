@@ -3,7 +3,7 @@
             [auctions.samples :refer [sample-auction]]
             [auctions.store :refer [add-bid create-auction db-from-ds
                                     get-auction]]
-            [clojure.test :refer :all]
+            [clojure.test :refer [deftest is]]
             [next.jdbc :as jdbc])
   (:import [java.time LocalDateTime]))
 
