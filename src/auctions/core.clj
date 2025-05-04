@@ -37,21 +37,20 @@
                              :handler (partial auction/list-all-auctions db)}
                    :post    {:summary "Creates a Auction resource."
                              :parameters {:body Auction}
-                             :handler (partial auction/create-auction db)}
-                   :options (fn [_] {:status 200})}]
+                             :handler (partial auction/create-auction db)}}]
 
      ["/auctions/:id" {:parameters {:path {:id AuctionId}}
                        :get        {:summary "Retrieves a Auction resource."
                                     :responses {200 {:body AuctionResult}
-                                                404 {:body nil}}
+                                                404 {:body nil?}}
                                     :handler (partial auction/retrieve-auction db)}}]
 
      ["/auctions/:id/bids" {:parameters {:body Bid
                                          :path {:id AuctionId}}
                             :post        {:summary "Add bid to auction resource."
                                           :responses {200 {:body AuctionResult}
-                                                      400 {:body nil}
-                                                      404 {:body nil}}
+                                                      400 {:body nil?}
+                                                      404 {:body nil?}}
                                           :handler (partial auction/add-bid-to-auction db)}}]]
 
     {:data {:muuntaja   m/instance
@@ -60,23 +59,23 @@
                                                 :formats {"application/json" coercion-malli/json-transformer-provider}}
                                          :string {:default coercion-malli/string-transformer-provider}
                                          :response {:default coercion-malli/default-transformer-provider}}
-                           ;; set of keys to include in error messages
+                          ;; set of keys to include in error messages
                           :error-keys #{#_:type #_:coercion :in #_:schema :value #_:errors :humanized #_:transformed}
-                           ;; support lite syntax?
+                          ;; support lite syntax?
                           :lite true
-                           ;; schema identity function (default: close all map schemas)
+                          ;; schema identity function (default: close all map schemas)
                           :compile mu/closed-schema
-                           ;; validate request & response
+                          ;; validate request & response
                           :validate true
-                           ;; top-level short-circuit to disable request & response coercion
+                          ;; top-level short-circuit to disable request & response coercion
                           :enabled true
-                           ;; strip-extra-keys (affects only predefined transformers)
+                          ;; strip-extra-keys (affects only predefined transformers)
                           :strip-extra-keys true
-                           ;; add/set default values
+                          ;; add/set default values
                           :default-values true
-                           ;; encode-error
+                          ;; encode-error
                           :encode-error nil
-                           ;; malli options
+                          ;; malli options
                           :options nil})
             :middleware [;; 
                          muuntaja/format-middleware
