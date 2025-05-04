@@ -43,11 +43,9 @@
                       :expiry (timestamp-to-string expiry)}))))
 
 (defn list-all-auctions [db request]
-  (if-authorized request
-                 (fn [_]
-                   (-> #(append-auction-url-and-convert-timestamps % request)
-                       (map (store/get-all-auctions db))
-                       rr/response))))
+  (-> #(append-auction-url-and-convert-timestamps % request)
+      (map (store/get-all-auctions db))
+      rr/response))
 
 (defn create-auction [db {:keys [body-params] :as request}]
   (if-authorized request
