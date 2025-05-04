@@ -26,6 +26,11 @@ If that port is in use, start it on a different port. For example, port 8100:
 $ clj -m auctions.core 8100
 ```
 
+## Updates
+
+In order to check for updates you can use: [antq](https://github.com/liquidz/antq)
+
+To install dependencies you can use `clojure -X:deps prep`
 # License & Copyright
 
 Copyright (c) 2023 Oskar Gewalli.
