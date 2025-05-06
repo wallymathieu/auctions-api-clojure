@@ -17,4 +17,6 @@
   (is (= {:status 200 :body []}
          (request db :get nil "/auctions")))
   (is (= {:status 404 :body nil}
-         (request db :get nil "/does-not-exist"))))
+         (request db :get nil "/does-not-exist")))
+  (is (= {:status 200 :body "file://favicon.svg"}
+         (request db :get nil "/favicon.svg"))))

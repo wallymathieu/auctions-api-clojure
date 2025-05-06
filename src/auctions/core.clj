@@ -93,6 +93,7 @@
                           :access-control-allow-methods [:get :put :post :patch :delete]]]}})
    (ring/routes
     (swagger-ui/create-swagger-ui-handler {:path "/"})
+    (ring/create-resource-handler {:path "/"})
     (ring/create-default-handler))
    ))
 

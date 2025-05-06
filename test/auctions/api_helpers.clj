@@ -8,6 +8,9 @@
     ; If it is a string, read as json
     (string? stream)
     (when-not (empty? stream) (json/read-str str :key-fn keyword))
+    ; If a file, get the file name and prefix with "file://"
+    (instance? java.io.File stream)
+    (str "file://" (.getName stream))
     ; If it is a stream, convert it to a string then read as json
     (some? stream)
     (let [bytes (.readAllBytes stream)
