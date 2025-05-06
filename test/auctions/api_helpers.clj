@@ -4,10 +4,17 @@
   (:import java.nio.charset.StandardCharsets))
 
 (defn- byte-array-read-string [stream]
-  (when (some? stream)
+  (cond
+    ; If it is a string, read as json
+    (string? stream)
+    (when-not (empty? stream) (json/read-str str :key-fn keyword))
+    ; If it is a stream, convert it to a string then read as json
+    (some? stream)
     (let [bytes (.readAllBytes stream)
           str (new String bytes StandardCharsets/UTF_8)]
-      (when-not (empty? str) (json/read-str str :key-fn keyword)))))
+      (when-not (empty? str) (json/read-str str :key-fn keyword))) 
+    ; it is nil
+    :else nil))
 
 (defn request
   ([db method token uri]

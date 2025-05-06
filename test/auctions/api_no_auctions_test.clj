@@ -15,4 +15,6 @@
   (is (= {:status 200 :body []}
          (request db :get buyer "/auctions")))
   (is (= {:status 200 :body []}
-         (request db :get nil "/auctions"))))
+         (request db :get nil "/auctions")))
+  (is (= {:status 404 :body nil}
+         (request db :get nil "/does-not-exist"))))

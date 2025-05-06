@@ -92,9 +92,9 @@
                          [wrap-cors :access-control-allow-origin  #".*"
                           :access-control-allow-methods [:get :put :post :patch :delete]]]}})
    (ring/routes
-    (swagger-ui/create-swagger-ui-handler {:path "/"}))
-   (ring/create-default-handler
-    {:not-found (constantly {:status 404 :body "Not found"})})))
+    (swagger-ui/create-swagger-ui-handler {:path "/"})
+    (ring/create-default-handler))
+   ))
 
 (defn -main [port]
   (let [db (jdbc/get-datasource jdbc-database-url)
