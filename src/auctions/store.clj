@@ -31,10 +31,17 @@
         bids-for-auction (fn [id] (get grouped-bids id []))]
     (map (map-auction-with-bids bids-for-auction) mapped-auctions)))
 
+(defn- get-bids-sql [db bids-sql-params]
+  (let [bids (jdbc/execute! db bids-sql-params db-options)]
+    bids))
+
 (defn get-auction [db id]
   (let [auctions (get-auctions-sql db ["SELECT * FROM auctions WHERE id = ?" id] ["SELECT * FROM bids WHERE auctionId = ?" id])]
     (first auctions)))
 
+(defn get-auction-winning-bid [db id]
+  (let [bids (get-bids-sql db ["SELECT * FROM bids WHERE auctionId = ? ORDER BY amount DESC" id])]
+    (first bids)))
 
 (defn add-bid [db body id]
   (jdbc/with-transaction [tx db]

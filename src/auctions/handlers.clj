@@ -66,8 +66,16 @@
                  (fn [user]
                    (let [id (-> parameters :path :id)
                          bid-with-user (merge body-params {:bidder (get user "sub")
-                                                           :at (LocalDateTime/now)})]
-                     (-> (store/add-bid db bid-with-user id)
-                         (append-auction-url-and-convert-timestamps request)
-                         nil-response-if-not-found)))))
+                                                           :at (LocalDateTime/now)})
+                         amount (get bid-with-user :amount)
+                         lowest-bid (store/get-auction-winning-bid db id)
+                         lowest-amount (if (some? lowest-bid) (get lowest-bid :amount) 0)]
+                     (if (> amount lowest-amount)
+                       (-> (store/add-bid db bid-with-user id)
+                           (append-auction-url-and-convert-timestamps request)
+                           nil-response-if-not-found)
+                       {:status 400
+                        :body {:value {:amount amount}
+                               :in ["request" "body-params"]
+                               :humanized {:amount ["must-place-bid-over-highest-bid"]}}})))))
 

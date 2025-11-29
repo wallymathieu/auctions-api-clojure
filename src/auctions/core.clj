@@ -2,7 +2,7 @@
   (:require [auctions.handlers :as auction]
             [auctions.migration :refer [migrate]]
             [auctions.spec :refer [Auction AuctionId AuctionResult
-                                   Bid ListOfAuctions]]
+                                   Bid ListOfAuctions ValidationError]]
             [auctions.store :as store :refer [jdbc-database-url]]
             [muuntaja.core :as m]
             [next.jdbc :as jdbc]
@@ -49,7 +49,7 @@
                                          :path {:id AuctionId}}
                             :post        {:summary "Add bid to auction resource."
                                           :responses {200 {:body AuctionResult}
-                                                      400 {:body nil?}
+                                                      400 {:body ValidationError}
                                                       404 {:body nil?}}
                                           :handler (partial auction/add-bid-to-auction db)}}]]
 

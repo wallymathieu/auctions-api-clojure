@@ -25,5 +25,13 @@
                                 :in ["request" "body-params"],
                                 :humanized {:amount ["missing required key"]}}}
            (request db :post buyer (str "/auctions/" auction-id "/bids") {})))
+    (is (= {:status 400 :body  {:value {:amount "x"},
+                                :in ["request" "body-params"],
+                                :humanized {:amount ["should be an integer"]}}}
+           (request db :post buyer (str "/auctions/" auction-id "/bids") {:amount "x"})))
     (is (= {:status 404 :body nil}
-           (request db :post buyer (str "/auctions/" 99 "/bids") {:amount 10})))))
+           (request db :post buyer (str "/auctions/" 99 "/bids") {:amount 10})))
+    (is (= {:status 400 :body  {:value {:amount 5},
+                                :in ["request" "body-params"],
+                                :humanized {:amount ["must-place-bid-over-highest-bid"]}}}
+           (request db :post buyer (str "/auctions/" auction-id "/bids") {:amount 5})))))
