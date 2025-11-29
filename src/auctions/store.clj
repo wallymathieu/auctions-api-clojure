@@ -32,8 +32,7 @@
     (map (map-auction-with-bids bids-for-auction) mapped-auctions)))
 
 (defn- get-bids-sql [db bids-sql-params]
-  (let [bids (jdbc/execute! db bids-sql-params db-options)]
-    bids))
+  (jdbc/execute! db bids-sql-params db-options))
 
 (defn get-auction [db id]
   (let [auctions (get-auctions-sql db ["SELECT * FROM auctions WHERE id = ?" id] ["SELECT * FROM bids WHERE auctionId = ?" id])]
