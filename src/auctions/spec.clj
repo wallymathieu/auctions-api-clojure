@@ -41,3 +41,9 @@
                   base-auction-parts)))
 
 (def ListOfAuctions (m/schema [:vector AuctionResult]))
+
+(def ValidationError
+  (m/schema [:map
+             [:value :any]
+             [:in [:vector :any]]
+             [:humanized :any]]))
