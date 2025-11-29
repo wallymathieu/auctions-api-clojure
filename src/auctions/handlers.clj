@@ -68,9 +68,9 @@
                          bid-with-user (merge body-params {:bidder (get user "sub")
                                                            :at (LocalDateTime/now)})
                          amount (get bid-with-user :amount)
-                         lowest-bid (store/get-auction-winning-bid db id)
-                         lowest-amount (if (some? lowest-bid) (get lowest-bid :amount) 0)]
-                     (if (> amount lowest-amount)
+                         highest-bid (store/get-auction-winning-bid db id)
+                         highest-amount (if (some? highest-bid) (get highest-bid :amount) 0)]
+                     (if (> amount highest-amount)
                        (-> (store/add-bid db bid-with-user id)
                            (append-auction-url-and-convert-timestamps request)
                            nil-response-if-not-found)
