@@ -1,0 +1,3 @@
+{:up ["ALTER TABLE auctions ADD COLUMN IF NOT EXISTS open boolean NOT NULL DEFAULT true;"
+      "DO $$ BEGIN IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'auctions' AND column_name = 'id' AND data_type = 'integer') THEN ALTER TABLE auctions ALTER COLUMN id TYPE bigint; END IF; END $$;"]
+ :down ["ALTER TABLE auctions DROP COLUMN IF EXISTS open;"]}

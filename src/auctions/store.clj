@@ -2,17 +2,25 @@
   (:require [clojure.set :refer [rename-keys]]
             [next.jdbc :as jdbc]
             [next.jdbc.result-set :as rs]
-            [next.jdbc.sql :as sql]))
+            [next.jdbc.sql :as sql])
+  (:import [java.sql Timestamp]
+           [java.time Instant]))
 
 (def jdbc-database-url (System/getenv "JDBC_DATABASE_URL"))
 
 (def ^:private db-options {:builder-fn rs/as-unqualified-lower-maps})
 
+(defn- parse-timestamp [v]
+  (when (string? v)
+    (Timestamp/from (Instant/parse v))))
+
 (defn- as-row [row]
-  (rename-keys row {:order :position, :expiry :endsAt}))
+  (cond-> (rename-keys row {:order :position})
+    (string? (:startsAt row)) (update :startsAt parse-timestamp)
+    (string? (:endsAt row))   (update :endsAt parse-timestamp)))
 
 (defn- as-auction [row]
-  (dissoc (rename-keys row {:position :order, :startsat :startsAt, :endsat :expiry}) :timeframe :minraise :reserveprice))
+  (dissoc (rename-keys row {:position :order, :startsat :startsAt, :endsat :endsAt, :winnerprice :winnerPrice}) :timeframe :minraise :reserveprice))
 
 (defn- as-bid [row]
   (dissoc (rename-keys row {:position :order}) :at :id :auctionid))

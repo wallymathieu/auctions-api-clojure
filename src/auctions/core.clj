@@ -37,6 +37,9 @@
                              :handler (partial auction/list-all-auctions db)}
                    :post    {:summary "Creates a Auction resource."
                              :parameters {:body Auction}
+                             :responses {200 {:body :any}
+                                         400 {:body :any}
+                                         401 {:body :any}}
                              :handler (partial auction/create-auction db)}}]
 
      ["/auctions/:id" {:parameters {:path {:id AuctionId}}
@@ -48,9 +51,10 @@
      ["/auctions/:id/bids" {:parameters {:body Bid
                                          :path {:id AuctionId}}
                             :post        {:summary "Add bid to auction resource."
-                                          :responses {200 {:body AuctionResult}
-                                                      400 {:body ValidationError}
-                                                      404 {:body nil?}}
+                                          :responses {200 {:body :any}
+                                                      400 {:body :any}
+                                                      401 {:body :any}
+                                                      404 {:body :any}}
                                           :handler (partial auction/add-bid-to-auction db)}}]]
 
     {:data {:muuntaja   m/instance
