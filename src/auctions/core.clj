@@ -2,7 +2,9 @@
   (:require [auctions.handlers :as auction]
             [auctions.migration :refer [migrate]]
             [auctions.spec :refer [Auction AuctionId AuctionResult
-                                   Bid ListOfAuctions ValidationError]]
+                                   AuctionAddedResponse AuctionErrorResponse
+                                   Bid BidAcceptedResponse BidErrorResponse
+                                   ErrorResponse ListOfAuctions ValidationError]]
             [auctions.store :as store :refer [jdbc-database-url]]
             [muuntaja.core :as m]
             [next.jdbc :as jdbc]
@@ -37,9 +39,9 @@
                              :handler (partial auction/list-all-auctions db)}
                    :post    {:summary "Creates a Auction resource."
                              :parameters {:body Auction}
-                             :responses {200 {:body :any}
-                                         400 {:body :any}
-                                         401 {:body :any}}
+                             :responses {200 {:body AuctionAddedResponse}
+                                         400 {:body AuctionErrorResponse}
+                                         401 {:body ErrorResponse}}
                              :handler (partial auction/create-auction db)}}]
 
      ["/auctions/:id" {:parameters {:path {:id AuctionId}}
@@ -51,10 +53,10 @@
      ["/auctions/:id/bids" {:parameters {:body Bid
                                          :path {:id AuctionId}}
                             :post        {:summary "Add bid to auction resource."
-                                          :responses {200 {:body :any}
-                                                      400 {:body :any}
-                                                      401 {:body :any}
-                                                      404 {:body :any}}
+                                          :responses {200 {:body BidAcceptedResponse}
+                                                      400 {:body BidErrorResponse}
+                                                      401 {:body ErrorResponse}
+                                                      404 {:body AuctionErrorResponse}}
                                           :handler (partial auction/add-bid-to-auction db)}}]]
 
     {:data {:muuntaja   m/instance

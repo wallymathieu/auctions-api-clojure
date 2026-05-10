@@ -50,3 +50,33 @@
              [:value :any]
              [:in [:vector :any]]
              [:humanized :any]]))
+
+(def ErrorResponse
+  (m/schema [:map
+             [:type non-empty-string]]))
+
+(def AuctionErrorResponse
+  (m/schema [:map
+             [:type non-empty-string]
+             [:auctionId AuctionId]]))
+
+(def BidErrorResponse
+  (m/schema [:map
+             [:type non-empty-string]
+             [:auctionId AuctionId]
+             [:amount {:optional true} :int]]))
+
+(def AuctionAddedResponse
+  (m/schema [:map
+             [:$type non-empty-string]
+             [:at non-empty-string]
+             [:auction AuctionResult]]))
+
+(def BidAcceptedResponse
+  (m/schema [:map
+             [:$type non-empty-string]
+             [:at non-empty-string]
+             [:bid [:map
+                    [:auction AuctionId]
+                    [:amount :int]
+                    [:bidder non-empty-string]]]]))
