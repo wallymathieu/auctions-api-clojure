@@ -11,7 +11,8 @@
   dev.weavejester/ragtime {:mvn/version "0.11.0"},
   org.clojure/data.json {:mvn/version "2.5.1"}}
  :aliases
- {:depstar {:extra-deps {seancorfield/depstar {:mvn/version "2.0.216"}}}
+ {:build {:deps {io.github.clojure/tools.build {:git/tag "v0.10.14" :git/sha "1176afd"}}
+          :ns-default build}
   :dev {:extra-paths ["dev"]}
   :test {:extra-paths ["test"]
          :extra-deps {io.github.cognitect-labs/test-runner

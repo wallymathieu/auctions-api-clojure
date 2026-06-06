@@ -2,5 +2,7 @@
 /.nrepl-port
 /.clj-kondo
 /.lsp
+/auctions.jar
+/target/
 .DS_Store
 .calva/
