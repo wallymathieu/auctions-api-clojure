@@ -12,15 +12,21 @@
 
 
 (deftest test-resource
-  (let [auction-id (-> (request db :post seller "/auctions" sample-auction) :body :id)
+  (let [auction-id (-> (request db :post seller "/auctions" sample-auction) :body :auction :id)
+        bid-response (request db :post buyer (str "/auctions/" auction-id "/bids") {:amount 10})
         expected-auction (merge sample-auction {:id auction-id,
                                                 :url (str "https://localhost/auctions/" auction-id),
                                                 :seller "a1",
-                                                :bids [{:bidder "a2", :amount 10}]})]
-    (is (= 1
-           auction-id))
+                                                :bids [{:bidder "a2", :amount 10}],
+                                                :winner nil,
+                                                :winnerPrice nil})]
+    (is (= 1 auction-id))
+    (is (= 200 (:status bid-response)))
+    (is (= "BidAccepted" (-> bid-response :body :$type)))
+    (is (= {:auction auction-id :amount 10 :bidder "a2"}
+           (-> bid-response :body :bid)))
     (is (= {:status 200 :body expected-auction}
-           (request db :post buyer (str "/auctions/" auction-id "/bids") {:amount 10})))
+           (request db :get buyer (str "/auctions/" auction-id))))
     (is (= {:status 400 :body  {:value {},
                                 :in ["request" "body-params"],
                                 :humanized {:amount ["missing required key"]}}}
@@ -29,9 +35,11 @@
                                 :in ["request" "body-params"],
                                 :humanized {:amount ["should be an integer"]}}}
            (request db :post buyer (str "/auctions/" auction-id "/bids") {:amount "x"})))
-    (is (= {:status 404 :body nil}
+    (is (= {:status 404 :body {:type "AuctionNotFound" :auctionId 99}}
            (request db :post buyer (str "/auctions/" 99 "/bids") {:amount 10})))
-    (is (= {:status 400 :body  {:value {:amount 5},
-                                :in ["request" "body-params"],
-                                :humanized {:amount ["must-place-bid-over-highest-bid"]}}}
-           (request db :post buyer (str "/auctions/" auction-id "/bids") {:amount 5})))))
+    (is (= {:status 400 :body {:type "MustPlaceBidOverHighestBid",
+                               :amount 10,
+                               :auctionId auction-id}}
+           (request db :post buyer (str "/auctions/" auction-id "/bids") {:amount 5})))
+    (is (= {:status 400 :body {:type "SellerCannotPlaceBids" :auctionId auction-id}}
+           (request db :post seller (str "/auctions/" auction-id "/bids") {:amount 20})))))

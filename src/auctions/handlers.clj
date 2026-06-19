@@ -79,8 +79,8 @@
 (defn list-all-auctions [db request]
   (->> (store/get-all-auctions db)
        (map #(enrich-with-winner db %))
-       (map #(append-auction-url-and-convert-timestamps % request))
-      rr/response))
+       (mapv #(append-auction-url-and-convert-timestamps % request))
+       rr/response))
 
 (defn create-auction [db {:keys [body-params] :as request}]
   (if-authorized request

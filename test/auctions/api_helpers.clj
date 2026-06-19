@@ -7,7 +7,7 @@
   (cond
     ; If it is a string, read as json
     (string? stream)
-    (when-not (empty? stream) (json/read-str str :key-fn keyword))
+    (when-not (empty? stream) (json/read-str stream :key-fn keyword))
     ; If a file, get the file name and prefix with "file://"
     (instance? java.io.File stream)
     (str "file://" (.getName stream))

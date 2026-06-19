@@ -26,10 +26,7 @@
   (dissoc (rename-keys row {:position :order}) :at :id :auctionid))
 
 (defn- map-auction-with-bids [bids-for-auction]
-  (fn [{:keys [id] :as auction}] (merge auction {:bids (map as-bid (bids-for-auction id))})))
-
-(defn create-auction [db auction]
-  (as-auction (sql/insert! db :auctions (as-row auction) db-options)))
+  (fn [{:keys [id] :as auction}] (merge auction {:bids (mapv as-bid (bids-for-auction id))})))
 
 (defn- get-auctions-sql [db auction-sql-params bids-sql-params]
   (let [auctions (jdbc/execute! db auction-sql-params db-options)
@@ -45,6 +42,12 @@
 (defn get-auction [db id]
   (let [auctions (get-auctions-sql db ["SELECT * FROM auctions WHERE id = ?" id] ["SELECT * FROM bids WHERE auctionId = ?" id])]
     (first auctions)))
+
+(defn create-auction [db auction]
+  ;; H2 only returns the generated id from insert!, while PostgreSQL returns the
+  ;; whole row, so re-fetch the auction to get the same shape on both databases.
+  (let [inserted (sql/insert! db :auctions (as-row auction) db-options)]
+    (get-auction db (or (:id auction) (:id inserted)))))
 
 (defn get-auction-winning-bid [db id]
   (let [bids (get-bids-sql db ["SELECT * FROM bids WHERE auctionId = ? ORDER BY amount DESC" id])]
