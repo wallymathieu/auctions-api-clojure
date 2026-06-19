@@ -1,0 +1,9 @@
+.git
+.github
+.cpcache
+.nrepl-port
+.clj-kondo
+.lsp
+.calva
+.DS_Store
+auctions.jar

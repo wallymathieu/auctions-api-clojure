@@ -1,17 +1,18 @@
 (ns auctions.spec-test
   (:require [auctions.samples :refer [sample-auction]]
-            [auctions.spec :refer [Auction AuctionId AuctionResult]]
+            [auctions.spec :refer [Auction AuctionId AuctionResult DateTime]]
             [clojure.test :refer [deftest is testing]]
             [malli.core :as m]))
 
 (let [valid-user "BuyerOrSeller|1|test@test.se"
-      valid-auction {:title "auction"
+      valid-auction {:id 1
+                     :title "auction"
                      :startsAt "2023-03-15T11:50:55Z"
-                     :expiry "2023-03-16T11:50:55Z"
+                     :endsAt "2023-03-16T11:50:55Z"
                      :seller valid-user
-                     :currency "SEK"}
-      valid-auction-with-url-and-bids (merge valid-auction {:id 1,
-                                                            :url "https://localhost/auctions/1",
+                     :currency "SEK"
+                     :open true}
+      valid-auction-with-url-and-bids (merge valid-auction {:url "https://localhost/auctions/1",
                                                             :bids []})
       invalid-auction-without-seller (dissoc  valid-auction :seller)
       invalid-auction-without-currency (dissoc  valid-auction :currency)
@@ -30,7 +31,14 @@
       (is (false? (m/validate AuctionResult invalid-auction-without-currency))))
     (testing "a valid auction"
       (is (true? (m/validate AuctionResult valid-auction)))
-      (is (true? (m/validate AuctionResult valid-auction)))
       (is (true? (m/validate Auction sample-auction)))
       (is (= valid-auction (m/coerce AuctionResult valid-auction)))
-      (is (true? (m/validate AuctionResult valid-auction-with-url-and-bids))))))
+      (is (true? (m/validate AuctionResult valid-auction-with-url-and-bids))))
+    (testing "DateTime accepts ISO-8601 instants with varying fractional precision"
+      (is (true? (m/validate DateTime "2023-03-15T11:50:55Z")))
+      (is (true? (m/validate DateTime "2023-03-15T11:50:55.123Z")))
+      (is (true? (m/validate DateTime "2023-03-15T11:50:55.123456Z")))
+      (is (true? (m/validate DateTime "2023-03-15T11:50:55.123456789Z"))))
+    (testing "DateTime rejects malformed instants"
+      (is (false? (m/validate DateTime "2023-03-15T11:50:55")))
+      (is (false? (m/validate DateTime "2023-03-15T11:50:55.1234567890Z"))))))

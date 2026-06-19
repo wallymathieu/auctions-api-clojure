@@ -4,10 +4,40 @@ It also offers a self-hosted OpenAPI documentation, accessible via Swagger UI.
 
 It persists auctions to Postgres via [next.jdbc](https://github.com/seancorfield/next-jdbc).
 
+# Run with Docker Compose
+
+The simplest way to run the app and Postgres together:
+
+```
+$ docker compose up
+```
+
+The API is then available at http://localhost:8080 (the app inside the container listens on 3000; the compose file maps it to 8080 on the host). Source is bind-mounted into the container, so editing files and restarting (`docker compose restart app`) picks up changes.
+
+To stop and remove the containers (keeps the database volume):
+
+```
+$ docker compose down
+```
+
+### Podman + docker-compose note
+
+If you're using `docker-compose` on top of Podman 3.x and see `CNI network "auctions-api-clojure_default" not found`, pre-create the network once:
+
+```
+$ podman network create auctions-api-clojure_default
+```
+
 # Run on localhost
 
 ## Configure PostgreSQL server
-First you must run a Postgres server with Docker for eg.:
+You can start just the database with compose:
+
+```
+$ docker compose up -d db
+```
+
+Or run Postgres manually:
 
 ```
 $ docker run --name some-postgres -e POSTGRES_DB=auctions -e POSTGRES_PASSWORD=mypass -d -p 5432:5432 postgres
