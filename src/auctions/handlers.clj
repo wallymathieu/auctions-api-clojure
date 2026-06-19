@@ -55,8 +55,12 @@
   (let [starts-at (instant-value (:startsAt auction))]
     (and (some? starts-at) (not (.isAfter starts-at now-instant)))))
 
-(defn- enrich-with-winner [db {:keys [id] :as auction}]
-  (let [winner-bid (store/get-auction-winning-bid db id)]
+(defn- winning-bid [auction]
+  (when-let [bids (seq (:bids auction))]
+    (apply max-key :amount bids)))
+
+(defn- enrich-with-winner [auction]
+  (let [winner-bid (winning-bid auction)]
     (if (ended? auction (now))
       (assoc auction
              :winner (:bidder winner-bid)
@@ -78,7 +82,7 @@
 
 (defn list-all-auctions [db request]
   (->> (store/get-all-auctions db)
-       (map #(enrich-with-winner db %))
+       (map enrich-with-winner)
        (mapv #(append-auction-url-and-convert-timestamps % request))
        rr/response))
 
@@ -101,13 +105,13 @@
                          (rr/response {:$type "AuctionAdded"
                                        :at (str (now))
                                        :auction (append-auction-url-and-convert-timestamps
-                                                 (enrich-with-winner db created-auction)
+                                                 (enrich-with-winner created-auction)
                                                  request)})))))))
 
 (defn retrieve-auction [db {:keys [parameters] :as request}]
   (let [id (-> parameters :path :id)]
     (-> (store/get-auction db id)
-        (some->> (enrich-with-winner db))
+        (some-> enrich-with-winner)
         (append-auction-url-and-convert-timestamps request)
         nil-response-if-not-found)))
 
