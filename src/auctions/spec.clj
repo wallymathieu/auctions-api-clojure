@@ -1,11 +1,14 @@
 (ns auctions.spec
-  (:require [malli.core :as m]))
+  (:require [malli.core :as m])
+  (:import java.time.Instant))
 
 (def ^:private non-empty-string (m/schema [:string {:min 1}]))
 
-(def ^:private date-regex  #"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z")
+(def DateTime
+  (m/schema [:and :string
+             [:fn {:error/message "must be a valid ISO-8601 instant"}
+              #(try (Instant/parse %) true (catch Exception _ false))]]))
 
-(def DateTime (m/schema  [:re date-regex]))
 
 (def AuctionId (m/schema integer?))
 

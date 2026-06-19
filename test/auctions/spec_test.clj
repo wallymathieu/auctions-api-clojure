@@ -1,6 +1,6 @@
 (ns auctions.spec-test
   (:require [auctions.samples :refer [sample-auction]]
-            [auctions.spec :refer [Auction AuctionId AuctionResult]]
+            [auctions.spec :refer [Auction AuctionId AuctionResult DateTime]]
             [clojure.test :refer [deftest is testing]]
             [malli.core :as m]))
 
@@ -33,4 +33,12 @@
       (is (true? (m/validate AuctionResult valid-auction)))
       (is (true? (m/validate Auction sample-auction)))
       (is (= valid-auction (m/coerce AuctionResult valid-auction)))
-      (is (true? (m/validate AuctionResult valid-auction-with-url-and-bids))))))
+      (is (true? (m/validate AuctionResult valid-auction-with-url-and-bids))))
+    (testing "DateTime accepts ISO-8601 instants with varying fractional precision"
+      (is (true? (m/validate DateTime "2023-03-15T11:50:55Z")))
+      (is (true? (m/validate DateTime "2023-03-15T11:50:55.123Z")))
+      (is (true? (m/validate DateTime "2023-03-15T11:50:55.123456Z")))
+      (is (true? (m/validate DateTime "2023-03-15T11:50:55.123456789Z"))))
+    (testing "DateTime rejects malformed instants"
+      (is (false? (m/validate DateTime "2023-03-15T11:50:55")))
+      (is (false? (m/validate DateTime "2023-03-15T11:50:55.1234567890Z"))))))
